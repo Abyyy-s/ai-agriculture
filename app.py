@@ -2,23 +2,46 @@ import streamlit as st
 import pandas as pd
 import joblib
 
-# load saved model
+# page configuration
+st.set_page_config(
+    page_title="AI Agriculture Advisor",
+    page_icon="🌱",
+    layout="centered"
+)
+
+# load model
 model = joblib.load("crop_model.pkl")
 
+# ---------- HEADER ----------
 st.title("🌱 AI Agriculture Advisor")
+st.markdown(
+"""
+Predict the best crop based on soil nutrients and environmental conditions.
+"""
+)
 
-st.write("Enter soil and environmental data")
+st.divider()
 
-# user inputs
-N = st.number_input("Nitrogen (N)")
-P = st.number_input("Phosphorus (P)")
-K = st.number_input("Potassium (K)")
-temperature = st.number_input("Temperature")
-humidity = st.number_input("Humidity")
-ph = st.number_input("pH Value")
-rainfall = st.number_input("Rainfall")
+# ---------- INPUT SECTION ----------
+st.subheader("Enter Soil & Weather Data")
 
-if st.button("Predict Crop"):
+col1, col2 = st.columns(2)
+
+with col1:
+    N = st.number_input("Nitrogen (N)", min_value=0)
+    P = st.number_input("Phosphorus (P)", min_value=0)
+    K = st.number_input("Potassium (K)", min_value=0)
+    temperature = st.number_input("Temperature (°C)")
+
+with col2:
+    humidity = st.number_input("Humidity (%)")
+    ph = st.number_input("pH Value")
+    rainfall = st.number_input("Rainfall (mm)")
+
+st.divider()
+
+# ---------- PREDICTION ----------
+if st.button("🌾 Predict Best Crop"):
 
     sample = pd.DataFrame(
         [[N,P,K,temperature,humidity,ph,rainfall]],
@@ -27,4 +50,10 @@ if st.button("Predict Crop"):
 
     prediction = model.predict(sample)
 
-    st.success(f"✅ Recommended Crop: {prediction[0]}")
+    st.success(f"✅ Recommended Crop: **{prediction[0].upper()}**")
+
+    st.balloons()
+
+# ---------- FOOTER ----------
+st.markdown("---")
+st.caption("Built using Machine Learning & Streamlit 🚀")
